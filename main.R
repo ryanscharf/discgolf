@@ -24,11 +24,28 @@ tournaments <- tournaments %>%
   filter(event_month == max(event_month))
 
 
+#tournaments without par column (C tiers?) causing error
+tournaments_round_info <- purrr::map(tournaments$event_id,
+                                     scrape_round_info)
+
+
+
+
+
+
+
+
+
+
+
+# tournements over time ---------------------------------------------------
+
+
 tournaments %>% 
   group_by(event_year, event_month) %>% 
   summarize(n = n()) %>% 
   mutate(
-    event_date = paste0(
-      event_year, '-', str_pad(event_month, 2, 'left', 0) )
-    ) %>% 
-  ggplot() + geom_point(aes(x = event_date, y = n))
+    event_date = as.Date(paste0(
+      event_year, '-', str_pad(event_month, 2, 'left', 0), '-01' )
+    )) %>% 
+  ggplot() + geom_line(aes(x = event_date, y = n, group = 1)) + scale_x_date()
